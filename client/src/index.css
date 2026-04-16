@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+
+  /* 🔥 ADD THIS */
+  background: linear-gradient(to right, #5f2c82, #49a09d);
+}
+
+/* 🔄 Loader animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
