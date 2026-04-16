@@ -14,7 +14,7 @@ function App() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/generate",
+         `${import.meta.env.VITE_API_URL}/api/generate`,
         { prompt },
         {
           headers: {
