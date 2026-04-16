@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config(); // ✅ MUST be before using process.env
 
 // 🔥 DEBUG (check env working or not)
-console.log("ENV TOKEN:", process.env.REPLICATE_API_TOKEN);
+
 console.log("CLOUD:", process.env.CLOUD_NAME);
 console.log("API KEY:", process.env.CLOUD_API_KEY);
 console.log("SECRET:", process.env.CLOUD_API_SECRET);
@@ -27,7 +27,15 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api", generateRoutes);
 
+// ✅ health check route (ADD HERE)
+app.get("/api", (req, res) => {
+  res.send("API Working 🚀");
+});
+
+
 // server start
-app.listen(process.env.PORT || 5000, () => {
-  console.log("🚀 Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
