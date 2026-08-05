@@ -15,9 +15,7 @@ const imageSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
-    timestamps: true, // ✅ auto adds createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model("Image", imageSchema);

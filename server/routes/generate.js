@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import fetch from "node-fetch";
+import Image from "../models/image.js";
 
 const router = express.Router();
 
@@ -8,14 +9,10 @@ router.post("/generate", auth, async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    // ❗ Prompt check
     if (!prompt) {
       return res.status(400).json({ error: "Prompt required" });
     }
 
-    console.log("🔥 Prompt:", prompt);
-
-    // 🔥 Unsplash API call
     const response = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(prompt)}&per_page=1`,
       {
@@ -27,22 +24,24 @@ router.post("/generate", auth, async (req, res) => {
 
     const data = await response.json();
 
-    // ❗ No result check
     if (!data.results || data.results.length === 0) {
       return res.status(404).json({ error: "No image found" });
     }
 
-    // ✅ Get image URL
     const image = data.results[0].urls.regular;
+
+    // ✅ Save history
+    await Image.create({
+      userId: req.user.id,
+      prompt,
+      imageUrl: image,
+    });
 
     res.json({ image });
 
   } catch (err) {
-    console.log("❌ ERROR:", err.message);
-
-    res.status(500).json({
-      error: "Image fetch failed",
-    });
+    console.error(err);
+    res.status(500).json({ error: "Image fetch failed" });
   }
 });
 
