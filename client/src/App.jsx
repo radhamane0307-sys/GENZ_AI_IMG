@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Login from "./Login";
+import Login from "./login";
 import Signup from "./Signup";
 import Home from "./Home";
 
