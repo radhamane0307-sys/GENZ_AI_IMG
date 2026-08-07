@@ -16,7 +16,7 @@ function Home() {
       setLoading(true);
 
       const res = await axios.post(
-  "http://localhost:5000/api/generate",
+  "https://genz-ai-img.onrender.com/api/generate",
   { prompt },
   {
     headers: {

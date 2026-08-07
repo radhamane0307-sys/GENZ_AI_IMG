@@ -6,7 +6,7 @@ export default function Signup({ setPage }) {
   const [password, setPassword] = useState("");
 
   const signup = async () => {
-    const res = await axios.post("http://localhost:5000/api/auth/signup", {
+    const res = await axios.post( "https://genz-ai-img.onrender.com/api/auth/signup", {
       email,
       password,
     });
