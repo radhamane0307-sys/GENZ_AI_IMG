@@ -7,103 +7,146 @@ function Home() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem("token");
-
   const generate = async () => {
-    if (!prompt) return alert("Enter prompt");
+    if (!prompt.trim()) {
+      alert("Enter prompt");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    // Token नाही तर Login करा
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
 
     try {
       setLoading(true);
 
-      const res = await axios.post(
-  "https://genz-ai-img.onrender.com/api/generate",
-  { prompt },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+      console.log("Token exists:", !!token);
+      console.log("Calling Generate API...");
 
-      setImage(res.data.image);
-      setHistory((prev) => [res.data.image, ...prev.slice(0, 5)]);
+      const res = await axios.post(
+        "https://genz-ai-img.onrender.com/api/generate",
+        {
+          prompt: prompt.trim(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Generate API response:", res.data);
+
+      if (res.data.image) {
+        setImage(res.data.image);
+        setHistory((prev) => [
+          res.data.image,
+          ...prev.slice(0, 5),
+        ]);
+      } else {
+        alert("Image URL not received from server");
+      }
     } catch (err) {
-      alert("Error generating image");
+      console.error("Generate API Error:", err);
+
+      if (err.response) {
+        console.error("Status:", err.response.status);
+        console.error("Data:", err.response.data);
+
+        alert(
+          `Error ${err.response.status}: ${
+            err.response.data?.error ||
+            err.response.data?.msg ||
+            "Image generation failed"
+          }`
+        );
+      } else {
+        alert("Cannot connect to backend");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const downloadImage = () => {
+    if (!image) return;
+
     const link = document.createElement("a");
     link.href = image;
-    link.download = "ai-image.jpg";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
     link.click();
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    window.location.reload();
+    window.location.href = "/";
   };
 
   return (
     <>
-      {/* 🎆 Animated Background Elements */}
-      <div className="wave-bg"></div>
-      <div className="orb orb-1"></div>
-      <div className="orb orb-2"></div>
-      <div className="orb orb-3"></div>
-      <div className="orb orb-4"></div>
-      <div className="shooting-star star-1"></div>
-      <div className="shooting-star star-2"></div>
-      <div className="shooting-star star-3"></div>
-      <div className="pulse-ring ring-1"></div>
-      <div className="pulse-ring ring-2"></div>
-      <div className="pulse-ring ring-3"></div>
-      <div className="noise-overlay"></div>
-
-      {/* 🔴 Logout Button */}
+      {/* Logout */}
       <button className="logout" onClick={logout}>
         Logout
       </button>
 
-      {/* 🏠 Main Container */}
+      {/* Main Container */}
       <div className="container">
         <h1>🚀 AI Image Generator</h1>
 
-        {/* 🔤 Input Section */}
+        {/* Input */}
         <div className="inputBox">
           <input
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Enter your imagination..."
-            onKeyPress={(e) => e.key === "Enter" && generate()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                generate();
+              }
+            }}
           />
-          <button onClick={generate}>Generate</button>
+
+          <button onClick={generate} disabled={loading}>
+            {loading ? "Generating..." : "Generate"}
+          </button>
         </div>
 
-        {/* 🔄 Loader */}
+        {/* Loader */}
         {loading && <div className="loader"></div>}
 
-        {/* 🖼 Image Section */}
+        {/* Image */}
         {image && !loading && (
           <div style={{ animation: "fadeIn 0.6s ease" }}>
-            <img src={image} alt="generated" />
+            <img
+              src={image}
+              alt="generated"
+            />
+
             <br />
-            <button onClick={downloadImage}>⬇️ Download</button>
+
+            <button onClick={downloadImage}>
+              ⬇️ Download
+            </button>
           </div>
         )}
 
-        {/* 📜 History */}
+        {/* History */}
         {history.length > 0 && (
           <>
             <h3>History</h3>
+
             <div className="history">
               {history.map((img, i) => (
                 <img
                   key={i}
                   src={img}
-                  alt="history"
+                  alt={`history-${i}`}
                   onClick={() => setImage(img)}
                 />
               ))}
