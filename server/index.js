@@ -21,6 +21,12 @@ app.get("/api", (req, res) => {
   res.send("API Working 🚀");
 });
 
+app.get("/api/generate-test", (req, res) => {
+  res.json({
+    message: "Generate route server is working 🚀",
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
